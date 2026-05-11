@@ -7,7 +7,7 @@ on:
       - main
 env: 
  Region: ap-south-1
- name: nginx:1
+ name: nginx1
  clustername: my-eks-cluster  
 
 jobs:  
@@ -53,10 +53,10 @@ jobs:
         run:  docker build -t ${{ env.name }} .
 
       - name: tag
-        run: docker tag nginx:latest 748716953870.dkr.ecr.ap-south-1.amazonaws.com/nginx:latest
+        run: docker tag nginx1:latest 748716953870.dkr.ecr.ap-south-1.amazonaws.com/nginx1:latest
            
       - name: push    
-        run:  docker push 748716953870.dkr.ecr.ap-south-1.amazonaws.com/nginx:latest 
+        run:  docker push 748716953870.dkr.ecr.ap-south-1.amazonaws.com/nginx1:latest 
              
 
       - name: Force ECS Deployment
