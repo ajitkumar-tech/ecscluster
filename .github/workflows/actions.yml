@@ -7,7 +7,7 @@ on:
       - main
 env: 
  Region: ap-south-1
- name: nginx
+ name: nginx:1
  clustername: my-eks-cluster  
 
 jobs:  
