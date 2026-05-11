@@ -63,16 +63,7 @@ jobs:
 
       
 
-      - name: deploy 
-        run: kubectl apply -f nginx-deployment-service.yaml
-
-      - name: svc
-        run: kubectl get svc
-      - name: pod
-        run: kubectl get pods
-
-      - name: log
-        run: kubectl describe pods nginx-deployment-54dcc97b7b-cmfkl  
+       
 
         
     
