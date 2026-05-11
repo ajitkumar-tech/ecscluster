@@ -53,10 +53,11 @@ jobs:
         run:  docker build -t ${{ env.name }} .
 
       - name: tag
-        run: docker tag nginx:latest 585768173504.dkr.ecr.${{ env.Region }}.amazonaws.com/${{ env.name }}:latest
+        run: docker tag nginx:latest 748716953870.dkr.ecr.ap-south-1.amazonaws.com/nginx:latest
            
       - name: push    
-        run:  docker push 585768173504.dkr.ecr.${{ env.Region }}.amazonaws.com/${{ env.name }}:latest
+        run:  docker push 748716953870.dkr.ecr.ap-south-1.amazonaws.com/nginx:latest 
+             
 
       - name: Force ECS Deployment
         run: |
