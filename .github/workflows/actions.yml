@@ -34,6 +34,11 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region:  ${{ env.Region }}
 
+      - name: Register ECS Task Definition
+        run: |
+         aws ecs register-task-definition \
+         --cli-input-json file://tomcat-task.json   
+
       - name: init
         run: terraform init
 
