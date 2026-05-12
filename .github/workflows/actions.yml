@@ -66,7 +66,7 @@ jobs:
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
          task-definition: tomcat-task.json
-         container-name: tomcat
+         container-name: tomcat-container
          image: 748716953870.dkr.ecr.ap-south-1.amazonaws.com/tomcat:latest 
 
       - name: Deploy to ECS
