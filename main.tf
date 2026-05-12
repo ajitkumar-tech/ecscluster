@@ -163,32 +163,6 @@ resource "aws_iam_role_policy_attachment" "ecs_task_execution_policy" {
 # ECS Task Definition
 # -------------------------------------------------
 
-resource "aws_ecs_task_definition" "nginx_task" {
-  family                   = "tomcat-task"
-  network_mode             = "awsvpc"
-  requires_compatibilities = ["FARGATE"]
-
-  cpu    = "256"
-  memory = "512"
-
-  execution_role_arn = aws_iam_role.ecs_task_execution_role.arn
-
-  container_definitions = jsonencode([
-    {
-      name      = "tomcat-container"
-      image     = "748716953870.dkr.ecr.ap-south-1.amazonaws.com/tomcat:latest"
-      essential = true
-
-      portMappings = [
-        {
-          containerPort = 8080
-          hostPort      = 8080
-          protocol      = "tcp"
-        }
-      ]
-    }
-  ])
-}
 
 # -------------------------------------------------
 # ECS Service
@@ -215,8 +189,6 @@ resource "aws_ecs_service" "nginx_service" {
     assign_public_ip = true
   }
 
-  depends_on = [
-    aws_ecs_task_definition.nginx_task
-  ]
+ 
 }
 
