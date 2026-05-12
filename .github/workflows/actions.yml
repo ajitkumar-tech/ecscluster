@@ -3,7 +3,7 @@ name: Remote Deployment
 
 on:  
   push:      
-    branches: 
+    branches:  
       - main
 env:  
   Region: ap-south-1
