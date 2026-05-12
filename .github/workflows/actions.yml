@@ -60,14 +60,25 @@ jobs:
            
       - name: push    
         run:  docker push 748716953870.dkr.ecr.ap-south-1.amazonaws.com/tomcat:latest 
+
+      - name: Render ECS Task Definition
+        id: task-def
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+         task-definition: task.json
+         container-name: my-container
+         image: myimage:latest
+
+      - name: Deploy to ECS
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v2
+        with:
+         task-definition: ${{ steps.task-def.outputs.task-definition }}
+         service: my-service
+         cluster: my-cluster
+         wait-for-service-stability: true   
              
 
-      - name: Force ECS Deployment
-        run: |
-          aws ecs update-service \
-            --cluster demo-ecs-cluster \
-            --service nginx-service \
-            --force-new-deployment  
+    
 
       
     
