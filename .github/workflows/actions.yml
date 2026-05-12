@@ -6,7 +6,7 @@ on:
     branches: 
       - main
 env: 
-  AWS_REGION: aps-south-1
+  AWS_REGION: ap-south-1
   ECS_TASK_DEFINITION: tomcat-task.json
   
 
