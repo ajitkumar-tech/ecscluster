@@ -78,8 +78,8 @@ jobs:
         uses: aws-actions/amazon-ecs-deploy-task-definition@v2
         with:
          task-definition: ${{ steps.task-def.outputs.task-definition }}
-         service: nginx_service
-         cluster: ecs_cluster
+         service: nginx-service
+         cluster: demo-ecs-cluster
          wait-for-service-stability: true   
              
 
