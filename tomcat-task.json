@@ -8,7 +8,7 @@
   "containerDefinitions": [
     {
       "name": "tomcat-container",
-      "image": "748716953870.dkr.ecr.ap-south-1.amazonaws.com/tomcat:latest ",
+      "image": "748716953870.dkr.ecr.ap-south-1.amazonaws.com/tomcat:latest",
       "essential": true,
       "cpu": 512,
       "memory": 1024,
