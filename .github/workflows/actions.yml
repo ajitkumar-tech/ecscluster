@@ -7,11 +7,8 @@ on:
       - main
 env: 
   AWS_REGION: aps-south-1
-  ECS_SERVICE: tomcat-service
-  ECS_CLUSTER: tomcat-cluster
-  ECR_REPOSITORY: tomcat-app
   ECS_TASK_DEFINITION: tomcat-task.json
-  CONTAINER_NAME: tomcat-container
+  
 
 jobs:  
   terraform:
@@ -76,8 +73,8 @@ jobs:
         uses: aws-actions/amazon-ecs-deploy-task-definition@v2
         with:
          task-definition: ${{ steps.task-def.outputs.task-definition }}
-         service: my-service
-         cluster: my-cluster
+         service: tomcat-service
+         cluster: tomcat-cluster
          wait-for-service-stability: true   
              
 
