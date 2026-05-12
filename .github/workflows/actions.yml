@@ -9,6 +9,7 @@ env:
   AWS_REGION: aps-south-1
   ECS_SERVICE: tomcat-service
   ECS_CLUSTER: tomcat-cluster
+  ECR_REPOSITORY: tomcat-app
   ECS_TASK_DEFINITION: tomcat-task.json
   CONTAINER_NAME: tomcat-container
 
