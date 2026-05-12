@@ -6,7 +6,7 @@ on:
     branches: 
       - main
 env: 
-  region: ap-south-1
+  Region: ap-south-1
   
   
 
