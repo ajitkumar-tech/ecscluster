@@ -164,7 +164,7 @@ resource "aws_iam_role_policy_attachment" "ecs_task_execution_policy" {
 # -------------------------------------------------
 
 resource "aws_ecs_task_definition" "nginx_task" {
-  family                   = "nginx-task"
+  family                   = "tomcat-task"
   network_mode             = "awsvpc"
   requires_compatibilities = ["FARGATE"]
 
@@ -175,14 +175,14 @@ resource "aws_ecs_task_definition" "nginx_task" {
 
   container_definitions = jsonencode([
     {
-      name      = "nginx-container"
-      image     = "748716953870.dkr.ecr.ap-south-1.amazonaws.com/nginx1:latest"
+      name      = "tomcat-container"
+      image     = "748716953870.dkr.ecr.ap-south-1.amazonaws.com/tomcat:latest"
       essential = true
 
       portMappings = [
         {
-          containerPort = 80
-          hostPort      = 80
+          containerPort = 8080
+          hostPort      = 8080
           protocol      = "tcp"
         }
       ]
