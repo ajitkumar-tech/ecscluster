@@ -65,7 +65,7 @@ jobs:
         id: task-def
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
-         task-definition: task.json
+         task-definition: tomcat-task.json
          container-name: tomcat
          image: 748716953870.dkr.ecr.ap-south-1.amazonaws.com/tomcat:latest 
 
