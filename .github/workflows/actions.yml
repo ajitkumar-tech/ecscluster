@@ -53,7 +53,7 @@ jobs:
         
 
       - name: build
-        run:  docker build -t ${{ env.name }} .
+        run:  docker build -t tomcat .
 
       - name: tag
         run: docker tag tomcat:latest 748716953870.dkr.ecr.ap-south-1.amazonaws.com/tomcat:latest
@@ -66,8 +66,8 @@ jobs:
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
          task-definition: task.json
-         container-name: my-container
-         image: myimage:latest
+         container-name: tomcat
+         image: 748716953870.dkr.ecr.ap-south-1.amazonaws.com/tomcat:latest 
 
       - name: Deploy to ECS
         uses: aws-actions/amazon-ecs-deploy-task-definition@v2
