@@ -6,9 +6,11 @@ on:
     branches: 
       - main
 env: 
- Region: ap-south-1
- name: tomcat
- clustername: my-eks-cluster  
+  AWS_REGION: aps-south-1
+  ECS_SERVICE: tomcat-service
+  ECS_CLUSTER: tomcat-cluster
+  ECS_TASK_DEFINITION: tomcat-task.json
+  CONTAINER_NAME: tomcat-container
 
 jobs:  
   terraform:
