@@ -171,6 +171,7 @@ resource "aws_iam_role_policy_attachment" "ecs_task_execution_policy" {
 resource "aws_ecs_service" "nginx_service" {
   name            = "nginx-service"
   cluster         = aws_ecs_cluster.ecs_cluster.id
+  task_definition = "tomcat-task" 
   launch_type     = "FARGATE"
 
   desired_count = 1
