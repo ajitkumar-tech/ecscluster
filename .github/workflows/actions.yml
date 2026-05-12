@@ -6,7 +6,7 @@ on:
     branches: 
       - main
 env: 
-  AWS_REGION: ap-south-1
+  region: ap-south-1
   
   
 
