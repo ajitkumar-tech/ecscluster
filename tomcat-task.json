@@ -1,4 +1,4 @@
-{
+{ 
   "family": "tomcat-task",
   "networkMode": "awsvpc",
   "requiresCompatibilities": ["FARGATE"],
