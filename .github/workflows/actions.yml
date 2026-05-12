@@ -7,7 +7,7 @@ on:
       - main
 env: 
  Region: ap-south-1
- name: nginx1
+ name: tomcat
  clustername: my-eks-cluster  
 
 jobs:  
@@ -57,7 +57,7 @@ jobs:
         run:  docker build -t ${{ env.name }} .
 
       - name: tag
-        run: docker tag nginx1:latest 748716953870.dkr.ecr.ap-south-1.amazonaws.com/nginx1:latest
+        run: docker tag tomcat:latest 748716953870.dkr.ecr.ap-south-1.amazonaws.com/tomcat:latest
            
       - name: push    
         run:  docker push 748716953870.dkr.ecr.ap-south-1.amazonaws.com/nginx1:latest 
