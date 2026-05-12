@@ -4,11 +4,11 @@
   "requiresCompatibilities": ["FARGATE"],
   "cpu": "512",
   "memory": "1024",
-  "executionRoleArn": "arn:aws:iam::123456789012:role/ecsTaskExecutionRole",
+  "executionRoleArn": "arn:aws:iam::748716953870:role/ecsTaskExecutionRole",
   "containerDefinitions": [
     {
       "name": "tomcat-container",
-      "image": "tomcat:9.0",
+      "image": "748716953870.dkr.ecr.ap-south-1.amazonaws.com/tomcat:latest ",
       "essential": true,
       "cpu": 512,
       "memory": 1024,
