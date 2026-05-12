@@ -42,7 +42,7 @@ jobs:
         run: terraform plan
 
       - name: apply
-        run: terraform destroy -auto-approve
+        run: terraform apply -auto-approve
 
       - name: Log in to Amazon ECR
         uses: aws-actions/amazon-ecr-login@v1
@@ -60,7 +60,7 @@ jobs:
         run: docker tag tomcat:latest 748716953870.dkr.ecr.ap-south-1.amazonaws.com/tomcat:latest
            
       - name: push    
-        run:  docker push 748716953870.dkr.ecr.ap-south-1.amazonaws.com/nginx1:latest 
+        run:  docker push 748716953870.dkr.ecr.ap-south-1.amazonaws.com/tomcat:latest 
              
 
       - name: Force ECS Deployment
