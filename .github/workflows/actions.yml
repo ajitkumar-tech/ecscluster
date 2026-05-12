@@ -7,7 +7,7 @@ on:
       - main
 env: 
   AWS_REGION: ap-south-1
-  ECS_TASK_DEFINITION: tomcat-task.json
+  
   
 
 jobs:  
