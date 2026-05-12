@@ -5,7 +5,7 @@ on:
   push:      
     branches: 
       - main
-env: 
+env:  
   Region: ap-south-1
   
   
