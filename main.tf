@@ -1,66 +1,47 @@
-provider "aws" { 
-  region = "ap-south-1"
+provider "aws" {
+region = "us-east-1"    
 }
 
-# -------------------------------------------------
-# VPC
-# -------------------------------------------------
 
-resource "aws_vpc" "main" {
-  cidr_block           = "10.0.0.0/16"
-  enable_dns_support   = true
-  enable_dns_hostnames = true
+resource "aws_vpc" "main" {           
+  cidr_block = "10.0.0.0/16" 
+  enable_dns_support   = true 
+  enable_dns_hostnames = true  
 
   tags = {
-    Name = "ecs-vpc"
+    Name = "MainVPC"
   }
 }
 
-# -------------------------------------------------
-# Internet Gateway
-# -------------------------------------------------
+resource "aws_subnet" "public_subnet_1" {   
+  vpc_id                  = aws_vpc.main.id     
+  cidr_block              = "10.0.1.0/24"
+  map_public_ip_on_launch = true
+  availability_zone       = "us-east-1a"  
+
+  tags = {
+    Name = "PublicSubnet1"
+  }
+}
+
+resource "aws_subnet" "public_subnet_2" {
+  vpc_id                  = aws_vpc.main.id
+  cidr_block              = "10.0.2.0/24"
+  map_public_ip_on_launch = true
+  availability_zone       = "us-east-1b"
+
+  tags = {
+    Name = "PublicSubnet2"
+  }
+}
 
 resource "aws_internet_gateway" "igw" {
   vpc_id = aws_vpc.main.id
 
   tags = {
-    Name = "ecs-igw"
+    Name = "MainIGW"
   }
 }
-
-# -------------------------------------------------
-# Public Subnet 1
-# -------------------------------------------------
-
-resource "aws_subnet" "public_1" {
-  vpc_id                  = aws_vpc.main.id
-  cidr_block              = "10.0.1.0/24"
-  availability_zone       = "ap-south-1a"
-  map_public_ip_on_launch = true
-
-  tags = {
-    Name = "ecs-public-subnet-1"
-  }
-}
-
-# -------------------------------------------------
-# Public Subnet 2
-# -------------------------------------------------
-
-resource "aws_subnet" "public_2" {
-  vpc_id                  = aws_vpc.main.id
-  cidr_block              = "10.0.2.0/24"
-  availability_zone       = "ap-south-1b"
-  map_public_ip_on_launch = true
-
-  tags = {
-    Name = "ecs-public-subnet-2"
-  }
-}
-
-# -------------------------------------------------
-# Route Table
-# -------------------------------------------------
 
 resource "aws_route_table" "public_rt" {
   vpc_id = aws_vpc.main.id
@@ -71,124 +52,141 @@ resource "aws_route_table" "public_rt" {
   }
 
   tags = {
-    Name = "ecs-public-rt"
+    Name = "PublicRouteTable"
   }
 }
 
-# -------------------------------------------------
-# Route Table Association
-# -------------------------------------------------
-
-resource "aws_route_table_association" "public_1_assoc" {
-  subnet_id      = aws_subnet.public_1.id
+resource "aws_route_table_association" "subnet_1_assoc" {
+  subnet_id      = aws_subnet.public_subnet_1.id
   route_table_id = aws_route_table.public_rt.id
 }
 
-resource "aws_route_table_association" "public_2_assoc" {
-  subnet_id      = aws_subnet.public_2.id
+resource "aws_route_table_association" "subnet_2_assoc" {
+  subnet_id      = aws_subnet.public_subnet_2.id
   route_table_id = aws_route_table.public_rt.id
 }
 
-# -------------------------------------------------
-# Security Group
-# -------------------------------------------------
-
-resource "aws_security_group" "ecs_sg" {
-  name        = "ecs-security-group"
-  description = "Allow HTTP"
-  vpc_id      = aws_vpc.main.id
-
-  ingress {
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
+resource "aws_security_group" "eks-sg" {
+  name        = "eks"
+  description = "Allow inbound and outbound traffic"
+  vpc_id = aws_vpc.main.id
 
   tags = {
-    Name = "ecs-sg"
+    Name = "eks_sg"
   }
-}
+ 
 
-# -------------------------------------------------
-# ECS Cluster
-# -------------------------------------------------
-
-resource "aws_ecs_cluster" "ecs_cluster" {
-  name = "demo-ecs-cluster"
-
-  setting {
-    name  = "containerInsights"
-    value = "enabled"
+  dynamic "ingress" {
+    iterator = port
+    for_each = var.ingress-rules
+    content {
+         description      = "Inbound Rules"
+         from_port        = port.value
+         to_port          = port.value
+         protocol         = "TCP"
+         cidr_blocks      = ["0.0.0.0/0"] 
+    }
   }
-}
 
-# -------------------------------------------------
-# IAM Role for ECS Task Execution
-# -------------------------------------------------
+ dynamic "egress" {
+    iterator = port
+    for_each = var.egress-rules
+    content {
+         description      = "outbound Rules"
+         from_port        = port.value
+         to_port          = port.value
+         protocol         = "TCP"
+         cidr_blocks      = ["0.0.0.0/0"] 
+    }
+  }
+}	
 
-resource "aws_iam_role" "ecs_task_execution_role" {
-  name = "ecsTaskExecutionRole"
-
+# Create IAM role with assume role policy for EKS cluster
+resource "aws_iam_role" "eks_cluster_role" {
+  name               = "eks-cluster-role" 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
-
     Statement = [
       {
-        Effect = "Allow"
-
+        Effect    = "Allow"
+        Action    = "sts:AssumeRole"
         Principal = {
-          Service = "ecs-tasks.amazonaws.com"
+          Service = "eks.amazonaws.com"  
         }
-
-        Action = "sts:AssumeRole"
       }
     ]
   })
 }
 
-resource "aws_iam_role_policy_attachment" "ecs_task_execution_policy" {
-  role       = aws_iam_role.ecs_task_execution_role.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
+# Attach AmazonEKSClusterPolicy to the EKS role
+resource "aws_iam_role_policy_attachment" "eks_cluster_policy" {
+  count = length(var.eks_cluster_policies)
+  role       = aws_iam_role.eks_cluster_role.name
+  policy_arn = var.eks_cluster_policies[count.index]
 }
 
-# -------------------------------------------------
-# ECS Task Definition
-# -------------------------------------------------
 
+resource "aws_eks_cluster" "eks_cluster" {
+  name     = "my-eks-cluster"
+  role_arn = aws_iam_role.eks_cluster_role.arn 
+  version = "1.32"
 
-# -------------------------------------------------
-# ECS Service
-# -------------------------------------------------
+  vpc_config {
+    subnet_ids         = [aws_subnet.public_subnet_1.id, aws_subnet.public_subnet_2.id]
+    security_group_ids = [aws_security_group.eks-sg.id] 
+    endpoint_private_access = true
+    endpoint_public_access  = true
+    }
+     depends_on = [aws_iam_role_policy_attachment.eks_cluster_policy]
 
-resource "aws_ecs_service" "nginx_service" {
-  name            = "nginx-service"
-  cluster         = aws_ecs_cluster.ecs_cluster.id
-  task_definition = "tomcat-task" 
-  launch_type     = "FARGATE"
-
-  desired_count = 1
-
-  network_configuration {
-    subnets = [
-      aws_subnet.public_1.id,
-      aws_subnet.public_2.id
-    ]
-
-    security_groups = [
-      aws_security_group.ecs_sg.id
-    ]
-
-    assign_public_ip = true
+  tags = {
+    Name   = "Eks-cluster"
   }
 
- 
 }
 
+resource "aws_iam_role" "eks_worker_role" {
+  name               = "eks-worker-node-role"  
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect    = "Allow"
+        Action    = "sts:AssumeRole"
+        Principal = {
+          Service = "ec2.amazonaws.com"  
+        }
+      }
+    ]
+  })
+}
+# Step 3: Attach each policy in the list to the IAM role using count
+resource "aws_iam_role_policy_attachment" "eks_worker_node_policy_attachment" {
+  count      = length(var.worker_node_policies) 
+  role       = aws_iam_role.eks_worker_role.name
+  policy_arn = var.worker_node_policies[count.index]
+}
+
+
+# Step 10: Create EKS Node Group (Worker Node Group)
+resource "aws_eks_node_group" "eks_node_group" {
+  cluster_name    = aws_eks_cluster.eks_cluster.name
+  node_group_name = "my-node-group"
+  node_role_arn   = aws_iam_role.eks_worker_role.arn 
+  subnet_ids      = [aws_subnet.public_subnet_1.id, aws_subnet.public_subnet_2.id]
+  instance_types  = ["t2.medium"] 
+  disk_size       = 20  
+  ami_type         = "AL2_x86_64"
+  capacity_type    = "ON_DEMAND"  
+  
+  tags = {
+    "Name"        = "eks-worker-node-group"
+  }
+
+  scaling_config {
+    desired_size = 1
+    max_size     = 1
+    min_size     = 1
+  }
+  depends_on = [aws_iam_role_policy_attachment.eks_worker_node_policy_attachment]
+}
